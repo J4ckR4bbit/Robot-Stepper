@@ -35,6 +35,8 @@ void flashLED(int repeats, int periodOne)
 //-----------------------------------------------------------------------------
 //        MOTOR ROUTINES
 //-----------------------------------------------------------------------------
+
+// MOTOR A
 void forwardMotor_A(int speed)
 {
   digitalWrite(directionStepperA, HIGH);
@@ -43,31 +45,6 @@ void forwardMotor_A(int speed)
     digitalWrite(triggerStepperA, HIGH);
     delayMicroseconds(speed);
     digitalWrite(triggerStepperA, LOW);
-    delayMicroseconds(speed);
-  }
-}
-void forwardMotor_B(int speed)
-{
-  digitalWrite(directionStepperB, LOW);
-  for(int x = 0; x < 200; x++)
-  {
-    digitalWrite(triggerStepperB, HIGH);
-    delayMicroseconds(speed);
-    digitalWrite(triggerStepperB, LOW);
-    delayMicroseconds(speed);
-  }
-}
-void forwardMotor_AB(int speed)
-{
-  digitalWrite(directionStepperA, HIGH);
-  digitalWrite(directionStepperB, LOW);
-  for(int x = 0; x < 200; x++)
-  {
-    digitalWrite(triggerStepperA, HIGH);
-    digitalWrite(triggerStepperB, HIGH);
-    delayMicroseconds(speed);
-    digitalWrite(triggerStepperA, LOW);
-    digitalWrite(triggerStepperB, LOW);
     delayMicroseconds(speed);
   }
 }
@@ -82,6 +59,32 @@ void reverseMotor_A(int speed)
     delayMicroseconds(speed);
   }
 }
+void forwardHalfMotor_A(int speed)
+{
+  sendToRegister(B00100000);
+  digitalWrite(directionStepperA, HIGH);
+  for(int x = 0; x < 800; x++)
+  {
+    digitalWrite(triggerStepperA, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperA, LOW);
+    delayMicroseconds(speed);
+  }
+  sendToRegister(B00000000);
+}
+
+// MOTOR B
+void forwardMotor_B(int speed)
+{
+  digitalWrite(directionStepperB, LOW);
+  for(int x = 0; x < 200; x++)
+  {
+    digitalWrite(triggerStepperB, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperB, LOW);
+    delayMicroseconds(speed);
+  }
+}
 void reverseMotor_B(int speed)
 {
   digitalWrite(directionStepperB, HIGH);
@@ -89,6 +92,22 @@ void reverseMotor_B(int speed)
   {
     digitalWrite(triggerStepperB, HIGH);
     delayMicroseconds(speed);
+    digitalWrite(triggerStepperB, LOW);
+    delayMicroseconds(speed);
+  }
+}
+
+// MOTOR A and B
+void forwardMotor_AB(int speed)
+{
+  digitalWrite(directionStepperA, HIGH);
+  digitalWrite(directionStepperB, LOW);
+  for(int x = 0; x < 200; x++)
+  {
+    digitalWrite(triggerStepperA, HIGH);
+    digitalWrite(triggerStepperB, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperA, LOW);
     digitalWrite(triggerStepperB, LOW);
     delayMicroseconds(speed);
   }
@@ -135,22 +154,25 @@ void setup() {
 //#############################################################################
 void loop() {
 
-forwardMotor_A(512);
+// forwardMotor_A(512);
+// flashLED(1, 256);
+//
+// forwardMotor_B(512);
+// flashLED(1, 256);
+//
+// forwardMotor_AB(512);
+// flashLED(3, 256);
+//
+// reverseMotor_A(512);
+// flashLED(1, 256);
+
+// reverseMotor_B(512);
+// flashLED(1, 256);
+//
+// reverseMotor_AB(512);
+// flashLED(6, 256);
+
+forwardHalfMotor_A(512);
 flashLED(1, 256);
-
-forwardMotor_B(512);
-flashLED(1, 256);
-
-forwardMotor_AB(512);
-flashLED(3, 256);
-
-reverseMotor_A(512);
-flashLED(1, 256);
-
-reverseMotor_B(512);
-flashLED(1, 256);
-
-reverseMotor_AB(512);
-flashLED(6, 256);
 
 }
