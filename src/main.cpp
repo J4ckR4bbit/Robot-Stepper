@@ -107,6 +107,8 @@ void reverseMotor_AB(int speed)
     delayMicroseconds(speed);
   }
 }
+
+
 //#############################################################################
 //        SEPTUP
 //#############################################################################
@@ -123,8 +125,8 @@ void setup() {
   pinMode(clockPin, OUTPUT);
 
 
-flashLED(5, 512);
-  // just a simple flashiing of LEDS to indicate set up is complete.
+ // just a simple flashiing of LEDS to indicate set up is complete.
+  flashLED(5, 512);
 
 }
 
