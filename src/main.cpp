@@ -20,35 +20,22 @@ void sendToRegister(byte insertByte) // send a byte to shift register
   shiftOut(dataPin, clockPin, LSBFIRST, insertByte);
   digitalWrite(latchPin, HIGH);
 }
-void SetupLED(int periodOne) // send LED switching to SHFTREG for setUP.
-{
-  sendToRegister(B10000000);
-  delay(periodOne);
-  sendToRegister(B00001000);
-  delay(periodOne);
-  sendToRegister(B10001000);
-  delay(periodOne / 2 );
-  sendToRegister(B00000000);
-  delay(periodOne / 2 );
-  sendToRegister(B10001000);
-  delay(periodOne);
-  sendToRegister(B00000000);
-}
-void flashLED(int repeats)
+
+void flashLED(int repeats, int periodOne)
 {
   for(int x = 0; x < repeats ; x++)
   {
     sendToRegister(B10001000);
-    delay(128);
+    delay(periodOne);
     sendToRegister(B00000000);
-    delay(128);
+    delay(periodOne);
   }
 }
 
 //-----------------------------------------------------------------------------
 //        MOTOR ROUTINES
 //-----------------------------------------------------------------------------
-void forwardMotorA(int speed)
+void forwardMotor_A(int speed)
 {
   digitalWrite(directionStepperA, HIGH);
   for(int x = 0; x < 200; x++)
@@ -59,7 +46,7 @@ void forwardMotorA(int speed)
     delayMicroseconds(speed);
   }
 }
-void forwardMotorB(int speed)
+void forwardMotor_B(int speed)
 {
   digitalWrite(directionStepperB, LOW);
   for(int x = 0; x < 200; x++)
@@ -70,7 +57,21 @@ void forwardMotorB(int speed)
     delayMicroseconds(speed);
   }
 }
-void reverseMotorA(int speed)
+void forwardMotor_AB(int speed)
+{
+  digitalWrite(directionStepperA, HIGH);
+  digitalWrite(directionStepperB, LOW);
+  for(int x = 0; x < 200; x++)
+  {
+    digitalWrite(triggerStepperA, HIGH);
+    digitalWrite(triggerStepperB, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperA, LOW);
+    digitalWrite(triggerStepperB, LOW);
+    delayMicroseconds(speed);
+  }
+}
+void reverseMotor_A(int speed)
 {
   digitalWrite(directionStepperA, LOW);
   for(int x = 0; x < 200; x++)
@@ -81,13 +82,27 @@ void reverseMotorA(int speed)
     delayMicroseconds(speed);
   }
 }
-void reverseMotorB(int speed)
+void reverseMotor_B(int speed)
 {
   digitalWrite(directionStepperB, HIGH);
   for(int x = 0; x < 200; x++)
   {
     digitalWrite(triggerStepperB, HIGH);
     delayMicroseconds(speed);
+    digitalWrite(triggerStepperB, LOW);
+    delayMicroseconds(speed);
+  }
+}
+void reverseMotor_AB(int speed)
+{
+  digitalWrite(directionStepperA, LOW);
+  digitalWrite(directionStepperB, HIGH);
+  for(int x = 0; x < 200; x++)
+  {
+    digitalWrite(triggerStepperA, HIGH);
+    digitalWrite(triggerStepperB, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperA, LOW);
     digitalWrite(triggerStepperB, LOW);
     delayMicroseconds(speed);
   }
@@ -108,8 +123,8 @@ void setup() {
   pinMode(clockPin, OUTPUT);
 
 
-
-  SetupLED(500); // just a simple flashiing of LEDS to indicate set up is complete.
+flashLED(5, 512);
+  // just a simple flashiing of LEDS to indicate set up is complete.
 
 }
 
@@ -118,17 +133,22 @@ void setup() {
 //#############################################################################
 void loop() {
 
-forwardMotorA(512);
-flashLED(3);
+forwardMotor_A(512);
+flashLED(1, 256);
 
-forwardMotorB(512);
-flashLED(3);
+forwardMotor_B(512);
+flashLED(1, 256);
 
-reverseMotorA(512);
-flashLED(3);
+forwardMotor_AB(512);
+flashLED(3, 256);
 
-reverseMotorB(512);
-flashLED(3);
+reverseMotor_A(512);
+flashLED(1, 256);
 
+reverseMotor_B(512);
+flashLED(1, 256);
+
+reverseMotor_AB(512);
+flashLED(6, 256);
 
 }
