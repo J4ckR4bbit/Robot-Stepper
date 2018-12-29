@@ -11,7 +11,7 @@ const byte triggerStepperB = 7;// Pin for triggering a step on stepper B
 const int dataPin = 8; // Pin that sends data to the shift register.
 const int latchPin = 9; // Pin that engages the latch on the shift register
 const int clockPin = 10; // Pin that for clock signal on the shift register
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //        REGISTER ROUTINES
 //-----------------------------------------------------------------------------
 void sendToRegister(byte insertByte) // send a byte to shift register
@@ -39,6 +39,7 @@ void flashLED(int repeats, int periodOne)
 // MOTOR A
 void forwardMotor_A(int speed)
 {
+  Serial.println(">> | MOTOR-A | FORWARD | FULL STEP | <<");
   digitalWrite(directionStepperA, HIGH);
   for(int x = 0; x < 200; x++)
   {
@@ -50,6 +51,7 @@ void forwardMotor_A(int speed)
 }
 void reverseMotor_A(int speed)
 {
+  Serial.println(">> | MOTOR-A | REVERSE | FULL STEP | <<");
   digitalWrite(directionStepperA, LOW);
   for(int x = 0; x < 200; x++)
   {
@@ -59,10 +61,25 @@ void reverseMotor_A(int speed)
     delayMicroseconds(speed);
   }
 }
-void forwardHalfMotor_A(int speed)
+void forwardQuarterMotor_A(int speed)
 {
+  Serial.println(">> | MOTOR-A | FORWARD | 1 / 4 STEP | <<");
   sendToRegister(B00100000);
   digitalWrite(directionStepperA, HIGH);
+  for(int x = 0; x < 800; x++)
+  {
+    digitalWrite(triggerStepperA, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperA, LOW);
+    delayMicroseconds(speed);
+  }
+  sendToRegister(B00000000);
+}
+void reverseQuarterMotor_A(int speed)
+{
+  Serial.println(">> | MOTOR-A | REVERSE | 1 / 4 STEP | <<");
+  sendToRegister(B00100000);
+  digitalWrite(directionStepperA, LOW);
   for(int x = 0; x < 800; x++)
   {
     digitalWrite(triggerStepperA, HIGH);
@@ -76,6 +93,7 @@ void forwardHalfMotor_A(int speed)
 // MOTOR B
 void forwardMotor_B(int speed)
 {
+  Serial.println(">> | MOTOR-B | FORWARD | FULL STEP | <<");
   digitalWrite(directionStepperB, LOW);
   for(int x = 0; x < 200; x++)
   {
@@ -87,6 +105,7 @@ void forwardMotor_B(int speed)
 }
 void reverseMotor_B(int speed)
 {
+  Serial.println(">> | MOTOR-B | REVERSE | FULL STEP | <<");
   digitalWrite(directionStepperB, HIGH);
   for(int x = 0; x < 200; x++)
   {
@@ -96,10 +115,39 @@ void reverseMotor_B(int speed)
     delayMicroseconds(speed);
   }
 }
+void forwardQuarterMotor_B(int speed)
+{
+  Serial.println(">> | MOTOR-B | FORWARD | 1 / 4 STEP | <<");
+  sendToRegister(B00000010);
+  digitalWrite(directionStepperB, LOW);
+  for(int x = 0; x < 800; x++)
+  {
+    digitalWrite(triggerStepperB, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperB, LOW);
+    delayMicroseconds(speed);
+  }
+  sendToRegister(B00000000);
+}
+void reverseQuarterMotor_B(int speed)
+{
+  Serial.println(">> | MOTOR-B | REVERSE | 1 / 4 STEP | <<");
+  sendToRegister(B00000010);
+  digitalWrite(directionStepperB, HIGH);
+  for(int x = 0; x < 800; x++)
+  {
+    digitalWrite(triggerStepperB, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperB, LOW);
+    delayMicroseconds(speed);
+  }
+  sendToRegister(B00000000);
+}
 
 // MOTOR A and B
 void forwardMotor_AB(int speed)
 {
+  Serial.println(">> | MOTOR- A & B | FORWARD | FULL STEP | <<");
   digitalWrite(directionStepperA, HIGH);
   digitalWrite(directionStepperB, LOW);
   for(int x = 0; x < 200; x++)
@@ -114,6 +162,7 @@ void forwardMotor_AB(int speed)
 }
 void reverseMotor_AB(int speed)
 {
+  Serial.println(">> | MOTOR- A & B | REVERSE | FULL STEP | <<");
   digitalWrite(directionStepperA, LOW);
   digitalWrite(directionStepperB, HIGH);
   for(int x = 0; x < 200; x++)
@@ -126,7 +175,38 @@ void reverseMotor_AB(int speed)
     delayMicroseconds(speed);
   }
 }
-
+void forwardQuarterMotor_AB(int speed)
+{
+  Serial.println(">> | MOTOR- A & B | FORWARD | 1 / 4 STEP | <<");
+  sendToRegister(B00100010);
+  digitalWrite(directionStepperA, HIGH);
+  digitalWrite(directionStepperB, LOW);
+  for(int x = 0; x < 800; x++)
+  {
+    digitalWrite(triggerStepperA, HIGH);
+    digitalWrite(triggerStepperB, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperA, LOW);
+    digitalWrite(triggerStepperB, LOW);
+    delayMicroseconds(speed);
+  }
+}
+void reverseQuarterMotor_AB(int speed)
+{
+  Serial.println(">> | MOTOR- A & B | FORWARD | 1 / 4 STEP | <<");
+  sendToRegister(B00100010);
+  digitalWrite(directionStepperA, LOW);
+  digitalWrite(directionStepperB, HIGH);
+  for(int x = 0; x < 800; x++)
+  {
+    digitalWrite(triggerStepperA, HIGH);
+    digitalWrite(triggerStepperB, HIGH);
+    delayMicroseconds(speed);
+    digitalWrite(triggerStepperA, LOW);
+    digitalWrite(triggerStepperB, LOW);
+    delayMicroseconds(speed);
+  }
+}
 
 //#############################################################################
 //        SEPTUP
@@ -144,7 +224,7 @@ void setup() {
   pinMode(clockPin, OUTPUT);
 
 
- // just a simple flashiing of LEDS to indicate set up is complete.
+  // just a simple flashiing of LEDS to indicate set up is complete.
   flashLED(5, 512);
 
 }
@@ -154,25 +234,40 @@ void setup() {
 //#############################################################################
 void loop() {
 
-// forwardMotor_A(512);
-// flashLED(1, 256);
-//
-// forwardMotor_B(512);
-// flashLED(1, 256);
-//
-// forwardMotor_AB(512);
-// flashLED(3, 256);
-//
-// reverseMotor_A(512);
-// flashLED(1, 256);
+int stepTiming = 700;
+  forwardMotor_A(stepTiming);
+  flashLED(1, 256);
 
-// reverseMotor_B(512);
-// flashLED(1, 256);
-//
-// reverseMotor_AB(512);
-// flashLED(6, 256);
+  forwardMotor_B(stepTiming);
+  flashLED(1, 256);
 
-forwardHalfMotor_A(512);
-flashLED(1, 256);
+  forwardMotor_AB(stepTiming);
+  flashLED(3, 256);
 
+  reverseMotor_A(stepTiming);
+  flashLED(1, 256);
+
+  reverseMotor_B(stepTiming);
+  flashLED(1, 256);
+
+  reverseMotor_AB(stepTiming);
+  flashLED(6, 256);
+
+  forwardQuarterMotor_A(stepTiming);
+  flashLED(1, 256);
+
+  forwardQuarterMotor_B(stepTiming);
+  flashLED(1, 256);
+
+  forwardQuarterMotor_AB(stepTiming);
+  flashLED(3, 256);
+
+  reverseQuarterMotor_A(stepTiming);
+  flashLED(1, 256);
+
+  reverseQuarterMotor_B(stepTiming);
+  flashLED(1, 256);
+
+  reverseQuarterMotor_AB(stepTiming);
+  flashLED(3, 256);
 }
